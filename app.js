@@ -141,12 +141,6 @@ app.get('/logout', (req, res) => {
   res.redirect('/login');
 })
 
-let todoList = [
-  {
-    id: 1,
-    todo: 'Implement a REST API',
-  },
-];
 
 app.use('/api*', checkAuth)
 
@@ -238,7 +232,7 @@ app.delete('/api/todos/:id', (req, res) => {
   const { id } = req.params;
   db.Todo.destroy({
     where: {
-      id: req.params.id
+      id: id
     }
   })
   .then((deleted) => {
