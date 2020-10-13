@@ -148,11 +148,16 @@ let todoList = [
   },
 ];
 
+app.use('/api*', checkAuth)
 
 
 // GET /api/todos
 app.get('/api/todos', (req, res) => {
-  db.Todo.findAll()
+  db.Todo.findAll({
+    where: {
+      UserId:req.session.user.id
+    }
+  })
     .then((todos) => {
       res.json(todos);
     })
@@ -188,7 +193,8 @@ app.post('/api/todos', (req, res) => {
     return;
   }
   db.Todo.create({
-    name: req.body.name
+    name: req.body.name,
+    UserId: req.session.user.id
   })
     .then((newTodo) => {
       res.json(newTodo);
