@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <h1>Login</h1>
+    ${ error ? `<em>${error}</em>`: ''}
+    <form action="" method="POST">
+        <div>
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" required>
+        </div>
+        <div>
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" required>
+            <!-- <label for="password">Password</label>
+            <input id="password-field" type="password" class="form-control" name="password" value="secret">
+            <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span> -->
+        </div>
+        <button type="submit">Login</button>
+    </form>
+</body>
+</html>
