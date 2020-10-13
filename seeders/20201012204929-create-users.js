@@ -11,6 +11,12 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
     */
+  await queryInterface.bulkInsert('Users', [
+    {
+      email: 'test@test.com',
+      password: ''
+    }
+  ])
   },
 
   down: async (queryInterface, Sequelize) => {

@@ -10,9 +10,53 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static('./public'));
 
+
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const store = new SequelizeStore({ db: db.sequelize});
+
+
+app.use(cookieParser()); 
+app.use(
+  session({
+    secret: 'secret', // used to sign the cookie
+    resave: false, // update session even w/ no changes
+    saveUninitialized: true, // always create a session
+    store: store,
+    // cookie: {
+    //   secure: false, // true: only accept https req's
+    //   maxAge: 2592000, // time in seconds
+}));
+
+store.sync();
+
+function checkAuth(req, res, next) {
+  if (req.session.user) {
+    next();
+  } else {
+    res.redirect('/login');
+  }
+}
+
+app.use((req,res,next) => {
+  console.log('===== USER =====')
+  console.log(req.session.user);
+  console.log('===== USER =====')
+  next();
+})
+
 app.engine('html', es6Renderer); // use es6renderer for html view templates
 app.set('views', 'templates'); // look in the 'templates' folder for view templates
 app.set('view engine', 'html'); // set the view engine to use the 'html' views
+
+app.get('/',checkAuth, (req, res) => {
+  res.render('index', {
+    locals: {
+      user: req.session.user
+    }
+  });
+})
 
 app.get('/register', (req, res) => {
   res.render('register', {
@@ -78,14 +122,24 @@ app.post('/login', (req, res) => {
       }
       bcrypt.compare(req.body.password, user.password, (err, matched) => {
         if(matched) {
-          res.send('YOU LOGGED IN')
+          req.session.user = user;
+          res.redirect('/');
         } else {
-          res.send('NOPE, TRY AGAIN: WRONG PASSWORD')
-        }
-        return;
+        res.render('login', {
+          locals: {
+            error: 'Incorrect password. Please try again.'
+          }
+        })
+      }
+      return;
       })
     })
   })
+
+app.get('/logout', (req, res) => {
+  req.session.user = null
+  res.redirect('/login');
+})
 
 let todoList = [
   {
@@ -93,6 +147,8 @@ let todoList = [
     todo: 'Implement a REST API',
   },
 ];
+
+
 
 // GET /api/todos
 app.get('/api/todos', (req, res) => {
